@@ -1,21 +1,15 @@
 package controllers
 
-import controllers.AuthorizationController.Authorized3
+import javax.inject.Inject
 import model.Toodledo
-import play.api.Play.current
-import play.api.libs.ws.WS
+import play.api.libs.ws.WSClient
 import play.api.mvc._
 
-import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
+import scala.concurrent.Future
 import scala.util.Random
 
-object Application extends Controller {
-
-  def index = Action {
-    Ok(views.html.index("Your new application is ready."))
-  }
+class Application @Inject()(components: ControllerComponents, ws: WSClient) extends AbstractController(components) {
 
   def index2 = Action { implicit request =>
     val accessToken = request.session.get("accessToken")
@@ -24,63 +18,63 @@ object Application extends Controller {
     } getOrElse {
       val clientId = System.getenv("CLIENT_ID")
 
-      def rnd = Random.alphanumeric.take(8).mkString
+      def rnd   = Random.alphanumeric.take(8).mkString
       val state = rnd
-      Redirect(s"https://api.toodledo.com/3/account/authorize" +
-        s".php?response_type=code&client_id=$clientId&state=$state&scope=basic")
+      Redirect(
+        s"https://api.toodledo.com/3/account/authorize" +
+          s".php?response_type=code&client_id=$clientId&state=$state&scope=basic")
         .addingToSession("state" -> state)
     }
   }
 
-  def index3 = Authorized2 { implicit request =>
-    println(request.user.accessToken)
-    Ok
-  }
-
-  def getTasks = Authorized3 { implicit request =>
-    println("start")
-    println(request.authorization.accessToken)
-    val fResponse = WS.url("abc").get()
-    val response = Await.result(fResponse, 10.seconds)
-    val json = response.json
-    println(json)
-    println("end")
-    val tasks = Seq(Task(1, "t1"), Task(2, "t2"), Task(3, "t3"))
-    Ok(views.html.tasks(tasks))
-  }
-
-  def showFolders() = Action.async { implicit request =>
-    Toodledo.fetchFolders() map { folders =>
+  def showFolders(): Action[AnyContent] = Action.async { implicit request =>
+    Toodledo.fetchFolders(ws) map { folders =>
       Ok(folders.toString())
     } recover {
       case e: Exception => InternalServerError(e.getMessage)
     }
   }
 
-  def showContexts() = Action.async { implicit request =>
-    Toodledo.fetchContexts() map { contexts =>
+  def showContexts(): Action[AnyContent] = Action.async { implicit request =>
+    Toodledo.fetchContexts(ws) map { contexts =>
       Ok(contexts.toString())
     } recover {
       case e: Exception => InternalServerError(e.getMessage)
     }
   }
 
-  def showGoals() = Action.async { implicit request =>
-    Toodledo.fetchGoals() map { goals =>
-      Ok(goals.toString())
-    } recover {
-      case e: Exception => InternalServerError(e.getMessage)
-    }
+  private def accessToken(implicit request: RequestHeader): Option[String] = request.session.get("accessToken")
+
+  def authenticate(): Action[AnyContent] = Action {
+    Redirect(
+      url = "https://api.toodledo.com/3/account/authorize.php",
+      queryString = Map(
+        "response_type" -> Seq("code"),
+        "client_id"     -> Seq("toodlekan"),
+        "state"         -> Seq("YourState"),
+        "scope"         -> Seq("basic tasks")
+      )
+    )
   }
 
-  def showTasks() = Action.async { implicit request =>
-    Toodledo.fetchTasks() map { tasks =>
+  def showGoals(): Action[AnyContent] = Action.async { implicit request =>
+    accessToken map { token =>
+      Toodledo.fetchGoals(ws, token) map { goals =>
+        goals.foreach(g => println(s"${g.name} ${g.note}"))
+        Ok(goals.toString())
+      } recover {
+        case e: Exception => InternalServerError(e.getMessage)
+      }
+    } getOrElse Future.successful(Redirect(routes.Application.authenticate()))
+  }
+
+  def showTasks(): Action[AnyContent] = Action.async { implicit request =>
+    Toodledo.fetchTasks(ws) map { tasks =>
       Ok(tasks.toString)
     } recover {
       case e: Exception => InternalServerError(e.getMessage)
     }
   }
 }
-
 
 case class Task(id: Int, title: String)
