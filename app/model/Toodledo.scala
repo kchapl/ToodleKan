@@ -1,17 +1,16 @@
 package model
 
-import play.api.Play.current
-import play.api.libs.json.{JsObject, JsArray, Reads}
-import play.api.libs.ws.WS
+import play.api.libs.json.{JsArray, Reads}
+import play.api.libs.ws.WSClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 object Toodledo {
 
-  private def fetch[T](path: String, sort: Option[T => Int] = None)(implicit tReads: Reads[T]): Future[Seq[T]] = {
-    val accessToken = generateAccessToken()
-    WS.url(s"https://api.toodledo.com/3/$path/get.php?access_token=$accessToken").get() map { response =>
+  private def fetch[T](ws: WSClient, accessToken: String, path: String, sort: Option[T => Int] = None)(
+    implicit tReads: Reads[T]): Future[Seq[T]] = {
+    ws.url(s"https://api.toodledo.com/3/$path/get.php?access_token=$accessToken").get() map { response =>
       response.status match {
         case 200 =>
           val ts = response.json.as[Seq[T]]
@@ -22,20 +21,23 @@ object Toodledo {
     }
   }
 
-  def fetchFolders(): Future[Seq[Folder]] = fetch[Folder]("folders", sort = Some(_.index))
+  def fetchFolders(ws: WSClient): Future[Seq[Folder]] =
+    fetch[Folder](ws, accessToken = "", path = "folders", sort = Some(_.index))
 
-  def fetchContexts(): Future[Seq[Context]] = fetch[Context]("contexts")
+  def fetchContexts(ws: WSClient): Future[Seq[Context]] = fetch[Context](ws, accessToken = "", path = "contexts")
 
-  def fetchGoals(): Future[Seq[Goal]] = fetch[Goal]("goals")
+  def fetchGoals(ws: WSClient, accessToken: String): Future[Seq[LifelongGoal]] =
+    fetch[Goal](ws, accessToken, path = "goals") map { LifelongGoal.fromGoals }
 
-  def fetchTasks(): Future[TaskList] = {
+  def fetchTasks(ws: WSClient): Future[TaskList] = {
     val accessToken = generateAccessToken()
-    WS.url(s"https://api.toodledo.com/3/tasks/get.php?access_token=$accessToken").get() map { response =>
+    ws.url(s"https://api.toodledo.com/3/tasks/get.php?access_token=$accessToken").get() map { response =>
       response.status match {
         case 200 =>
           response.json match {
             case JsArray(jsItems) =>
               TaskList((jsItems.head \ "num").as[Int], (jsItems.head \ "total").as[Int], jsItems.tail.map(_.as[Task]))
+            case _ => TaskList(0, 0, Nil)
           }
         case _ =>
           throw response.json.as[ToodledoException]

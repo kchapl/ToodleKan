@@ -1,18 +1,16 @@
 package controllers
 
-import play.api.Play.current
-import play.api.libs.iteratee.Iteratee
-import play.api.libs.ws.{WS, WSAuthScheme}
+import javax.inject.Inject
+import play.api.libs.functional.syntax._
+import play.api.libs.json._
+import play.api.libs.ws.{WSAuthScheme, WSClient}
 import play.api.mvc._
 
-import scala.concurrent.Future
-import scala.util.Random
 import scala.concurrent.ExecutionContext.Implicits.global
-import play.api.libs.json._
-import play.api.libs.functional.syntax._
+import scala.util.Random
 
-
-object AuthorizationController extends Controller {
+class AuthorizationController @Inject()(components: ControllerComponents, ws: WSClient)
+  extends AbstractController(components) {
 
   implicit val authorizationReads: Reads[Authorization] = (
     (JsPath \ "access_token").read[String] and
@@ -20,25 +18,26 @@ object AuthorizationController extends Controller {
       (JsPath \ "token_type").read[String] and
       (JsPath \ "scope").read[String] and
       (JsPath \ "refresh_token").read[String]
-    )(Authorization.apply _)
+  )(Authorization.apply _)
 
-  val clientId = System.getenv("CLIENT_ID")
+  val clientId: String = System.getenv("CLIENT_ID")
 
-  val clientSecret = System.getenv("CLIENT_SECRET")
+  val clientSecret: String = System.getenv("CLIENT_SECRET")
 
-  def rnd = Random.alphanumeric.take(8).mkString
+  def rnd: String = Random.alphanumeric.take(8).mkString
 
   class AccessTokenRequest[A](val accessToken: Option[String], request: Request[A]) extends WrappedRequest[A](request)
 
   // todo compare state
-  def authCallback(code: String, state: String) = Action.async { implicit request =>
-
-    val x = WS.url("https://api.toodledo.com/3/account/token.php")
+  def authCallback(code: String, state: String): Action[AnyContent] = Action.async { implicit request =>
+    val x = ws
+      .url("https://api.toodledo.com/3/account/token.php")
       .withAuth(clientId, clientSecret, WSAuthScheme.BASIC)
-      .post(Map(
-      "grant_type" -> Seq("authorization_code"),
-      "code" -> Seq(code)
-    ))
+      .post(
+        Map(
+          "grant_type" -> Seq("authorization_code"),
+          "code"       -> Seq(code)
+        ))
 
     val z = for {
       y <- x
@@ -50,7 +49,8 @@ object AuthorizationController extends Controller {
 
         val k = s.as[Authorization]
 
-        Ok("OK")
+//        Ok("OK")
+          Redirect(routes.Application.showGoals())
           .removingFromSession("state")
           .addingToSession("accessToken" -> k.accessToken)
       } else {
@@ -62,10 +62,6 @@ object AuthorizationController extends Controller {
   }
 
   def Authenticated(action: String => Action[AnyContent]): Action[AnyContent] = {
-
-    def getAccessToken(request: RequestHeader): Option[String] = {
-      request.session.get("accessToken")
-    }
 
     Action { request =>
       //  val x = getAccessToken(request).map(token => action(token)(request)).get
@@ -79,9 +75,8 @@ object AuthorizationController extends Controller {
 
 }
 
-
 object Authorized {
-   def apply[A](accessToken:String => Result): Action[A] = ???
+  def apply[A](accessToken: String => Result): Action[A] = ???
 }
 
 case class Authorization(accessToken: String, expiresIn: Int, tokenType: String, scope: String, refreshToken: String)
