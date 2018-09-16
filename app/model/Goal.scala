@@ -3,7 +3,7 @@ package model
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
-case class Goal(id: Long, name: String, level: Int, archived: Boolean, contributes: Option[Long], note: String)
+case class Goal(id: Long, name: String, level: Int, archived: Boolean, contributes: Long, note: String)
 
 object Goal {
 
@@ -12,7 +12,7 @@ object Goal {
       (__ \ "name").read[String] and
       (__ \ "level").read[Int] and
       (__ \ "archived").read[Int].map(_ == 1) and
-      (__ \ "contributes").read[Long].map(x => if (x == 0) None else Some(x)) and
+      (__ \ "contributes").read[Long] and
       (__ \ "note").read[String]
   )(Goal.apply _)
 }
