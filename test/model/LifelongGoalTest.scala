@@ -36,5 +36,13 @@ class LifelongGoalTest extends PlaySpec {
         LifelongGoal.empty(Seq(LongTermGoal("name", "note", Nil)))
       )
     }
+    "generate correct hierarchy from short-term goal without a long-term goal" in {
+      val goals = Seq(
+        Goal(1, "name", 2, false, 0, "note"),
+      )
+      LifelongGoal.fromGoals(goals) mustBe Seq(
+        LifelongGoal.empty(Seq(LongTermGoal.empty(Seq(ShortTermGoal("name", "note", Nil)))))
+      )
+    }
   }
 }

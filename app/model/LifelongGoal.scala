@@ -19,6 +19,10 @@ object LifelongGoal {
         ShortTermGoal(goal.name, goal.note, Nil)
       })
 
+    val orphanShortTermGoals = shortTerm.filter { case (contributes, _) => contributes == 0 }.map {
+      case (_, subGoals) => LongTermGoal.empty(subGoals)
+    }
+
     val longTerm = goals
       .filter { _.level == 1 }
       .groupBy(_.contributes)

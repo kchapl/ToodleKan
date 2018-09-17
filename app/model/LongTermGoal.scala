@@ -5,3 +5,7 @@ case class LongTermGoal(
   note: String,
   subGoals: Seq[ShortTermGoal]
 )
+
+object LongTermGoal {
+  def empty(subGoals: Seq[ShortTermGoal]) = LongTermGoal("***unknown***", "", subGoals)
+}
