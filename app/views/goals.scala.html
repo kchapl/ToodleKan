@@ -1,0 +1,41 @@
+@import model.LifelongGoal
+@(topLevel: Seq[LifelongGoal])
+
+<html>
+    <head>
+        <title>Goals</title>
+    </head>
+    <body>
+        <table>
+            <tbody>
+            @for(g <- topLevel) {
+                <tr>
+                    <td>@g.name</td>
+                    <td>
+                        <table>
+                            <tbody>
+                            @for(sg <- g.subGoals) {
+                                <tr>
+                                    <td>@sg.name</td>
+                                    <td>
+                                        <table>
+                                            <tbody>
+                                            @for(ssg <- sg.subGoals) {
+                                                <tr>
+                                                    <td>@ssg.name</td>
+                                                </tr>
+                                            }
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            }
+        </tbody>
+        </table>
+    </body>
+</html>

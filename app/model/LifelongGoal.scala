@@ -28,7 +28,10 @@ object LifelongGoal {
       .groupBy(_.contributes)
       .mapValues(_ map { goal =>
         LongTermGoal(goal.name, goal.note, shortTerm.getOrElse(goal.id, Nil))
-      })
+      }) ++ {
+      if (orphanShortTermGoals.isEmpty) None
+      else Some(Map(0L -> orphanShortTermGoals.toSeq))
+    }.getOrElse(Map.empty)
 
     val orphanLongTermGoals = longTerm.filter { case (contributes, _) => contributes == 0 }.map {
       case (_, subGoals) => LifelongGoal.empty(subGoals)
