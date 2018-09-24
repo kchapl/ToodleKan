@@ -1,7 +1,15 @@
 package model
 
 case class ShortTermGoal(
-  name: String,
-  note: String,
-  tasks: Seq[Task]
+    id: Long,
+    name: String,
+    note: String,
+    tasks: Seq[Task]
 )
+
+object ShortTermGoal {
+  def subGoals(parent:LongTermGoal, goals:Seq[Goal]):Seq[ShortTermGoal] = goals.filter{ goal =>
+    goal.level == 2 && goal.contributes == parent.id}.map{goal =>
+    ShortTermGoal(goal.id,goal.name,goal.note,Nil)
+  }
+}

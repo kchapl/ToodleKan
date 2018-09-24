@@ -9,7 +9,7 @@ class LifelongGoalTest extends PlaySpec {
       val goals = Seq(
         Goal(1, "name", 0, false, 0, "note")
       )
-      LifelongGoal.fromGoals(goals) mustBe Seq(LifelongGoal("name", "note", Nil))
+      LifelongGoal.fromGoals(goals) mustBe Seq(LifelongGoal(1, "name", "note", Nil))
     }
     "generate correct hierarchy from lifelong goal with long-term goal" in {
       val goals = Seq(
@@ -17,7 +17,7 @@ class LifelongGoalTest extends PlaySpec {
         Goal(2, "name", 1, false, 1, "note")
       )
       LifelongGoal.fromGoals(goals) mustBe Seq(
-        LifelongGoal("name", "note", Seq(LongTermGoal("name", "note", Nil)))
+        LifelongGoal(1, "name", "note", Seq(LongTermGoal(2, "name", "note", Nil)))
       )
     }
     "generate correct hierarchy from lifelong goal with long-term goal with short-term goal" in {
@@ -28,9 +28,10 @@ class LifelongGoalTest extends PlaySpec {
       )
       LifelongGoal.fromGoals(goals) mustBe Seq(
         LifelongGoal(
+          1,
           "name",
           "note",
-          Seq(LongTermGoal("name", "note", Seq(ShortTermGoal("name", "note", Nil))))
+          Seq(LongTermGoal(2, "name", "note", Seq(ShortTermGoal(3,"name", "note", Nil))))
         )
       )
     }
@@ -41,9 +42,11 @@ class LifelongGoalTest extends PlaySpec {
         Goal(3, "long-term2", 1, false, 0, "note")
       )
       LifelongGoal.fromGoals(goals) mustBe Seq(
-        LifelongGoal("lifelong", "note", Nil),
+        LifelongGoal(1, "lifelong", "note", Nil),
         LifelongGoal.empty(
-          Seq(LongTermGoal("long-term1", "note", Nil), LongTermGoal("long-term2", "note", Nil))
+          Seq(
+            LongTermGoal(2, "long-term1", "note", Nil),
+            LongTermGoal(3, "long-term2", "note", Nil))
         )
       )
     }
@@ -52,17 +55,19 @@ class LifelongGoalTest extends PlaySpec {
         Goal(1, "name", 1, false, 0, "note"),
       )
       LifelongGoal.fromGoals(goals) mustBe Seq(
-        LifelongGoal.empty(Seq(LongTermGoal("name", "note", Nil)))
+        LifelongGoal.empty(Seq(LongTermGoal(1, "name", "note", Nil)))
       )
     }
     "generate correct hierarchy from multiple long-term goals without a lifelong goal" in {
       val goals = Seq(
         Goal(1, "long-term1", 1, false, 0, "note"),
-        Goal(1, "long-term2", 1, false, 0, "note"),
+        Goal(2, "long-term2", 1, false, 0, "note"),
       )
       LifelongGoal.fromGoals(goals) mustBe Seq(
         LifelongGoal.empty(
-          Seq(LongTermGoal("long-term1", "note", Nil), LongTermGoal("long-term2", "note", Nil)))
+          Seq(
+            LongTermGoal(1, "long-term1", "note", Nil),
+            LongTermGoal(2, "long-term2", "note", Nil)))
       )
     }
     "generate correct hierarchy from long-term goal with a short-term goal without a lifelong goal" in {
@@ -72,7 +77,7 @@ class LifelongGoalTest extends PlaySpec {
       )
       LifelongGoal.fromGoals(goals) mustBe Seq(
         LifelongGoal.empty(
-          Seq(LongTermGoal("long-term", "note", Seq(ShortTermGoal("short-term", "note", Nil))))
+          Seq(LongTermGoal(1, "long-term", "note", Seq(ShortTermGoal(2,"short-term", "note", Nil))))
         )
       )
     }
@@ -81,7 +86,7 @@ class LifelongGoalTest extends PlaySpec {
         Goal(1, "name", 2, false, 0, "note"),
       )
       LifelongGoal.fromGoals(goals) mustBe Seq(
-        LifelongGoal.empty(Seq(LongTermGoal.empty(Seq(ShortTermGoal("name", "note", Nil)))))
+        LifelongGoal.empty(Seq(LongTermGoal.empty(Seq(ShortTermGoal(1,"name", "note", Nil)))))
       )
     }
     "generate correct hierarchy from complex structure" in {
@@ -104,25 +109,26 @@ class LifelongGoalTest extends PlaySpec {
         Goal(798951, "g798951", 0, false, 0, "note")
       )
       LifelongGoal.fromGoals(goals) mustBe Seq(
-        LifelongGoal("g798951", "note", Nil),
+        LifelongGoal(798951, "g798951", "note", Nil),
         LifelongGoal.empty(
           Seq(
+            LongTermGoal.empty(Seq(
+              ShortTermGoal(798421,"g798421", "note", Nil),
+              ShortTermGoal(795379, "g795379", "note", Nil),
+              ShortTermGoal(798211, "g798211", "note", Nil),
+              ShortTermGoal(798207, "g798207", "note", Nil),
+              ShortTermGoal(798247, "g798247", "note", Nil),
+              ShortTermGoal(794881, "g794881", "note", Nil),
+              ShortTermGoal(795173, "g795173", "note", Nil),
+              ShortTermGoal(798209, "g798209", "note", Nil)
+            )),
             LongTermGoal(
+              786813,
               "g786813",
               "note",
-              Seq(ShortTermGoal("g795247", "note", Nil), ShortTermGoal("g794941", "note", Nil))),
-            LongTermGoal("g789005", "note", Seq(ShortTermGoal("g796075", "note", Nil))),
-            LongTermGoal("g795175", "note", Seq(ShortTermGoal("g765337", "note", Nil))),
-            LongTermGoal.empty(Seq(
-              ShortTermGoal("g798421", "note", Nil),
-              ShortTermGoal("g795379", "note", Nil),
-              ShortTermGoal("g798211", "note", Nil),
-              ShortTermGoal("g798207", "note", Nil),
-              ShortTermGoal("g798247", "note", Nil),
-              ShortTermGoal("g794881", "note", Nil),
-              ShortTermGoal("g795173", "note", Nil),
-              ShortTermGoal("g798209", "note", Nil)
-            ))
+              Seq(ShortTermGoal(795247, "g795247", "note", Nil), ShortTermGoal(794941, "g794941", "note", Nil))),
+            LongTermGoal(789005, "g789005", "note", Seq(ShortTermGoal(796075, "g796075", "note", Nil))),
+            LongTermGoal(795175, "g795175", "note", Seq(ShortTermGoal(765337, "g765337", "note", Nil)))
           ))
       )
     }

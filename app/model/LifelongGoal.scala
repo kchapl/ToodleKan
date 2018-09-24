@@ -1,44 +1,35 @@
 package model
 
 case class LifelongGoal(
-  name: String,
-  note: String,
-  subGoals: Seq[LongTermGoal]
+    id: Long,
+    name: String,
+    note: String,
+    subGoals: Seq[LongTermGoal]
 )
 
 object LifelongGoal {
 
-  def empty(subGoals: Seq[LongTermGoal]) = LifelongGoal("***unknown***", "", subGoals)
+  def empty(subGoals: Seq[LongTermGoal]) = LifelongGoal(0, "***unknown***", "", subGoals)
 
   def fromGoals(goals: Seq[Goal]): Seq[LifelongGoal] = {
 
-    val shortTerm = goals
-      .filter { _.level == 2 }
-      .groupBy(_.contributes)
-      .mapValues(_ map { goal =>
-        ShortTermGoal(goal.name, goal.note, Nil)
-      })
-
-    val orphanShortTermGoals = shortTerm.filter { case (contributes, _) => contributes == 0 }.map {
-      case (_, subGoals) => LongTermGoal.empty(subGoals)
+    val x = goals.filter { _.level == 0 }.map { goal =>
+      LifelongGoal(goal.id, goal.name, goal.note, Nil)
     }
 
-    val longTerm = goals
-      .filter { _.level == 1 }
-      .groupBy(_.contributes)
-      .mapValues(_ map { goal =>
-        LongTermGoal(goal.name, goal.note, shortTerm.getOrElse(goal.id, Nil))
-      }) ++ {
-      if (orphanShortTermGoals.isEmpty) None
-      else Some(Map(0L -> orphanShortTermGoals.toSeq))
-    }.getOrElse(Map.empty)
+    x
+  }
 
-    val orphanLongTermGoals = longTerm.filter { case (contributes, _) => contributes == 0 }.map {
-      case (_, subGoals) => LifelongGoal.empty(subGoals)
+  def goalHierarchy(goals:Seq[Goal]):Seq[LifelongGoal] = {
+    val x = fromGoals(goals)
+    val m = x map { u =>
+      val r = LongTermGoal.subGoals(u, goals)
+      val g = r map { t =>
+        val p = ShortTermGoal.subGoals(t,goals)
+        t.copy(subGoals = p)
+      }
+      u.copy(subGoals = g)
     }
-
-    goals.filter { _.level == 0 }.map { goal =>
-      LifelongGoal(goal.name, goal.note, longTerm.getOrElse(goal.id, Nil))
-    } ++ orphanLongTermGoals
+    m
   }
 }
