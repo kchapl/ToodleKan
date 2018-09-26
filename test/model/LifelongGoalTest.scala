@@ -4,19 +4,19 @@ import org.scalatestplus.play.PlaySpec
 
 class LifelongGoalTest extends PlaySpec {
 
-  "fromGoals" must {
+  "goalHierarchy" must {
     "generate correct hierarchy from single goal" in {
       val goals = Seq(
         Goal(1, "name", 0, false, 0, "note")
       )
-      LifelongGoal.fromGoals(goals) mustBe Seq(LifelongGoal(1, "name", "note", Nil))
+      LifelongGoal.goalHierarchy(goals) mustBe Seq(LifelongGoal(1, "name", "note", Nil))
     }
     "generate correct hierarchy from lifelong goal with long-term goal" in {
       val goals = Seq(
         Goal(1, "name", 0, false, 0, "note"),
         Goal(2, "name", 1, false, 1, "note")
       )
-      LifelongGoal.fromGoals(goals) mustBe Seq(
+      LifelongGoal.goalHierarchy(goals) mustBe Seq(
         LifelongGoal(1, "name", "note", Seq(LongTermGoal(2, "name", "note", Nil)))
       )
     }
@@ -26,12 +26,12 @@ class LifelongGoalTest extends PlaySpec {
         Goal(2, "name", 1, false, 1, "note"),
         Goal(3, "name", 2, false, 2, "note")
       )
-      LifelongGoal.fromGoals(goals) mustBe Seq(
+      LifelongGoal.goalHierarchy(goals) mustBe Seq(
         LifelongGoal(
           1,
           "name",
           "note",
-          Seq(LongTermGoal(2, "name", "note", Seq(ShortTermGoal(3,"name", "note", Nil))))
+          Seq(LongTermGoal(2, "name", "note", Seq(ShortTermGoal(3, "name", "note", Nil))))
         )
       )
     }
@@ -41,7 +41,7 @@ class LifelongGoalTest extends PlaySpec {
         Goal(2, "long-term1", 1, false, 0, "note"),
         Goal(3, "long-term2", 1, false, 0, "note")
       )
-      LifelongGoal.fromGoals(goals) mustBe Seq(
+      LifelongGoal.goalHierarchy(goals) mustBe Seq(
         LifelongGoal(1, "lifelong", "note", Nil),
         LifelongGoal.empty(
           Seq(
@@ -54,7 +54,7 @@ class LifelongGoalTest extends PlaySpec {
       val goals = Seq(
         Goal(1, "name", 1, false, 0, "note"),
       )
-      LifelongGoal.fromGoals(goals) mustBe Seq(
+      LifelongGoal.goalHierarchy(goals) mustBe Seq(
         LifelongGoal.empty(Seq(LongTermGoal(1, "name", "note", Nil)))
       )
     }
@@ -63,7 +63,7 @@ class LifelongGoalTest extends PlaySpec {
         Goal(1, "long-term1", 1, false, 0, "note"),
         Goal(2, "long-term2", 1, false, 0, "note"),
       )
-      LifelongGoal.fromGoals(goals) mustBe Seq(
+      LifelongGoal.goalHierarchy(goals) mustBe Seq(
         LifelongGoal.empty(
           Seq(
             LongTermGoal(1, "long-term1", "note", Nil),
@@ -75,9 +75,10 @@ class LifelongGoalTest extends PlaySpec {
         Goal(1, "long-term", 1, false, 0, "note"),
         Goal(2, "short-term", 2, false, 1, "note")
       )
-      LifelongGoal.fromGoals(goals) mustBe Seq(
+      LifelongGoal.goalHierarchy(goals) mustBe Seq(
         LifelongGoal.empty(
-          Seq(LongTermGoal(1, "long-term", "note", Seq(ShortTermGoal(2,"short-term", "note", Nil))))
+          Seq(
+            LongTermGoal(1, "long-term", "note", Seq(ShortTermGoal(2, "short-term", "note", Nil))))
         )
       )
     }
@@ -85,8 +86,8 @@ class LifelongGoalTest extends PlaySpec {
       val goals = Seq(
         Goal(1, "name", 2, false, 0, "note"),
       )
-      LifelongGoal.fromGoals(goals) mustBe Seq(
-        LifelongGoal.empty(Seq(LongTermGoal.empty(Seq(ShortTermGoal(1,"name", "note", Nil)))))
+      LifelongGoal.goalHierarchy(goals) mustBe Seq(
+        LifelongGoal.empty(Seq(LongTermGoal.empty(Seq(ShortTermGoal(1, "name", "note", Nil)))))
       )
     }
     "generate correct hierarchy from complex structure" in {
@@ -108,12 +109,29 @@ class LifelongGoalTest extends PlaySpec {
         Goal(795175, "g795175", 1, false, 0, "note"),
         Goal(798951, "g798951", 0, false, 0, "note")
       )
-      LifelongGoal.fromGoals(goals) mustBe Seq(
+      LifelongGoal.goalHierarchy(goals) mustBe Seq(
         LifelongGoal(798951, "g798951", "note", Nil),
         LifelongGoal.empty(
           Seq(
+            LongTermGoal(
+              786813,
+              "g786813",
+              "note",
+              Seq(
+                ShortTermGoal(795247, "g795247", "note", Nil),
+                ShortTermGoal(794941, "g794941", "note", Nil))),
+            LongTermGoal(
+              789005,
+              "g789005",
+              "note",
+              Seq(ShortTermGoal(796075, "g796075", "note", Nil))),
+            LongTermGoal(
+              795175,
+              "g795175",
+              "note",
+              Seq(ShortTermGoal(765337, "g765337", "note", Nil))),
             LongTermGoal.empty(Seq(
-              ShortTermGoal(798421,"g798421", "note", Nil),
+              ShortTermGoal(798421, "g798421", "note", Nil),
               ShortTermGoal(795379, "g795379", "note", Nil),
               ShortTermGoal(798211, "g798211", "note", Nil),
               ShortTermGoal(798207, "g798207", "note", Nil),
@@ -121,14 +139,7 @@ class LifelongGoalTest extends PlaySpec {
               ShortTermGoal(794881, "g794881", "note", Nil),
               ShortTermGoal(795173, "g795173", "note", Nil),
               ShortTermGoal(798209, "g798209", "note", Nil)
-            )),
-            LongTermGoal(
-              786813,
-              "g786813",
-              "note",
-              Seq(ShortTermGoal(795247, "g795247", "note", Nil), ShortTermGoal(794941, "g794941", "note", Nil))),
-            LongTermGoal(789005, "g789005", "note", Seq(ShortTermGoal(796075, "g796075", "note", Nil))),
-            LongTermGoal(795175, "g795175", "note", Seq(ShortTermGoal(765337, "g765337", "note", Nil)))
+            ))
           ))
       )
     }

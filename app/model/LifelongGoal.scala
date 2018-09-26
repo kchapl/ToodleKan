@@ -9,7 +9,7 @@ case class LifelongGoal(
 
 object LifelongGoal {
 
-  def empty(subGoals: Seq[LongTermGoal]) = LifelongGoal(0, "***unknown***", "", subGoals)
+  def empty(subGoals: Seq[LongTermGoal]) :LifelongGoal = LifelongGoal(0, "***unknown***", "", subGoals)
 
   def fromGoals(goals: Seq[Goal]): Seq[LifelongGoal] = {
 
@@ -17,19 +17,24 @@ object LifelongGoal {
       LifelongGoal(goal.id, goal.name, goal.note, Nil)
     }
 
-    x
+    val y = x :+ empty(Nil)
+//    val y = x
+    y
   }
 
   def goalHierarchy(goals:Seq[Goal]):Seq[LifelongGoal] = {
     val x = fromGoals(goals)
     val m = x map { u =>
-      val r = LongTermGoal.subGoals(u, goals)
+      val p = if(u.id == 0) Seq(LongTermGoal.empty(Nil)) else Nil
+      val r = LongTermGoal.subGoals(u, goals) ++ p
       val g = r map { t =>
         val p = ShortTermGoal.subGoals(t,goals)
         t.copy(subGoals = p)
-      }
+      } filterNot(f => f.id ==0 && f.subGoals.isEmpty)
       u.copy(subGoals = g)
     }
-    m
+    m filterNot(f => f.id == 0 && f.subGoals.isEmpty)
   }
+
+  def fromGoals(goals:Seq[Goal], longTermGoals:Seq[LongTermGoal]):Seq[LifelongGoal] = ???
 }
