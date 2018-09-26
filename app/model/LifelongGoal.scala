@@ -17,9 +17,7 @@ object LifelongGoal {
       LifelongGoal(goal.id, goal.name, goal.note, Nil)
     }
 
-    val y = x :+ empty(Nil)
-//    val y = x
-    y
+    x :+ empty(Nil)
   }
 
   def goalHierarchy(goals:Seq[Goal]):Seq[LifelongGoal] = {

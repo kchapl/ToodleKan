@@ -60,7 +60,6 @@ class Application @Inject()(components: ControllerComponents, ws: WSClient) exte
   def showGoals(): Action[AnyContent] = Action.async { implicit request =>
     accessToken map { token =>
       Toodledo.fetchGoals(ws, token) map { goals =>
-        println(goals(1).subGoals.length)
         Ok(views.html.goals(goals))
       } recover {
         case e: Exception => InternalServerError(e.getMessage)

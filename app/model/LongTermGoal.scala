@@ -14,23 +14,13 @@ object LongTermGoal {
 
   def subGoals(parent: LifelongGoal, goals: Seq[Goal]): Seq[LongTermGoal] = {
 
-
-    println(parent.id)
-
-
-
     val x = goals
       .filter { goal => goal.level == 1 && goal.contributes == parent.id
       }
       .map(toLongTermGoal)
 
-
-
     x.foreach(y => y.id)
-
 
     x
   }
-
-  def fromGoals(goals:Seq[Goal], shortTermGoals:Seq[ShortTermGoal]):Seq[LongTermGoal] = ???
 }
