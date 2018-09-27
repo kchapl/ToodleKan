@@ -9,7 +9,8 @@ case class LifelongGoal(
 
 object LifelongGoal {
 
-  def empty(subGoals: Seq[LongTermGoal]) :LifelongGoal = LifelongGoal(0, "***unknown***", "", subGoals)
+  def empty(subGoals: Seq[LongTermGoal]): LifelongGoal =
+    LifelongGoal(0, "***unknown***", "", subGoals)
 
   def fromGoals(goals: Seq[Goal]): Seq[LifelongGoal] = {
 
@@ -20,19 +21,19 @@ object LifelongGoal {
     x :+ empty(Nil)
   }
 
-  def goalHierarchy(goals:Seq[Goal]):Seq[LifelongGoal] = {
+  def goalHierarchy(goals: Seq[Goal]): Seq[LifelongGoal] = {
     val x = fromGoals(goals)
     val m = x map { u =>
-      val p = if(u.id == 0) Seq(LongTermGoal.empty(Nil)) else Nil
+      val p = if (u.id == 0) Seq(LongTermGoal.empty(Nil)) else Nil
       val r = LongTermGoal.subGoals(u, goals) ++ p
       val g = r map { t =>
-        val p = ShortTermGoal.subGoals(t,goals)
+        val p = ShortTermGoal.subGoals(t, goals)
         t.copy(subGoals = p)
-      } filterNot(f => f.id ==0 && f.subGoals.isEmpty)
+      } filterNot (f => f.id == 0 && f.subGoals.isEmpty)
       u.copy(subGoals = g)
     }
-    m filterNot(f => f.id == 0 && f.subGoals.isEmpty)
+    m filterNot (f => f.id == 0 && f.subGoals.isEmpty)
   }
 
-  def fromGoals(goals:Seq[Goal], longTermGoals:Seq[LongTermGoal]):Seq[LifelongGoal] = ???
+  def fromGoals(goals: Seq[Goal], longTermGoals: Seq[LongTermGoal]): Seq[LifelongGoal] = ???
 }

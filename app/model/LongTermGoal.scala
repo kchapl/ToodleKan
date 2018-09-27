@@ -15,7 +15,8 @@ object LongTermGoal {
   def subGoals(parent: LifelongGoal, goals: Seq[Goal]): Seq[LongTermGoal] = {
 
     val x = goals
-      .filter { goal => goal.level == 1 && goal.contributes == parent.id
+      .filter { goal =>
+        goal.level == 1 && goal.contributes == parent.id
       }
       .map(toLongTermGoal)
 

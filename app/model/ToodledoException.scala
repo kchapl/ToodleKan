@@ -12,5 +12,5 @@ object ToodledoException {
   implicit val jsonReads = (
     (__ \ "errorCode").read[Int] and
       (__ \ "errorDesc").read[String]
-    )(ToodledoException.apply _)
+  )(ToodledoException.apply _)
 }

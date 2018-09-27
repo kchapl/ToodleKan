@@ -10,7 +10,7 @@ object Task {
   implicit val jsonReads = (
     (__ \ "id").read[Long] and
       (__ \ "title").read[String]
-    )(Task.apply _)
+  )(Task.apply _)
 }
 
 case class TaskList(num: Int, total: Int, tasks: Seq[Task])

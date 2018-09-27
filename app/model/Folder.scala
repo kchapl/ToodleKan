@@ -11,5 +11,5 @@ object Folder {
     (__ \ "id").read[Long] and
       (__ \ "name").read[String] and
       (__ \ "ord").read[Int]
-    )(Folder.apply _)
+  )(Folder.apply _)
 }
