@@ -10,5 +10,5 @@ object Context {
   implicit val jsonReads = (
     (__ \ "id").read[Long] and
       (__ \ "name").read[String]
-    )(Context.apply _)
+  )(Context.apply _)
 }

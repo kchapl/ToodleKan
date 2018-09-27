@@ -24,10 +24,10 @@ object ShortTermGoal {
         goal.level == 2
       }
       .groupBy(_.contributes)
-      x.mapValues { goals =>
+    x.mapValues { goals =>
       goals.map { goal =>
         ShortTermGoal(goal.id, goal.name, goal.note, Nil)
       }
-      }
+    }
   }
 }

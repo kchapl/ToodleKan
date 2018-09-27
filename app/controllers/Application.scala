@@ -9,7 +9,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Random
 
-class Application @Inject()(components: ControllerComponents, ws: WSClient) extends AbstractController(components) {
+class Application @Inject()(components: ControllerComponents, ws: WSClient)
+    extends AbstractController(components) {
 
   def index2 = Action { implicit request =>
     val accessToken = request.session.get("accessToken")
@@ -18,7 +19,7 @@ class Application @Inject()(components: ControllerComponents, ws: WSClient) exte
     } getOrElse {
       val clientId = System.getenv("CLIENT_ID")
 
-      def rnd   = Random.alphanumeric.take(8).mkString
+      def rnd = Random.alphanumeric.take(8).mkString
       val state = rnd
       Redirect(
         s"https://api.toodledo.com/3/account/authorize" +
@@ -43,16 +44,17 @@ class Application @Inject()(components: ControllerComponents, ws: WSClient) exte
     }
   }
 
-  private def accessToken(implicit request: RequestHeader): Option[String] = request.session.get("accessToken")
+  private def accessToken(implicit request: RequestHeader): Option[String] =
+    request.session.get("accessToken")
 
   def authenticate(): Action[AnyContent] = Action {
     Redirect(
       url = "https://api.toodledo.com/3/account/authorize.php",
       queryString = Map(
         "response_type" -> Seq("code"),
-        "client_id"     -> Seq("toodlekan"),
-        "state"         -> Seq("YourState"),
-        "scope"         -> Seq("basic tasks")
+        "client_id" -> Seq("toodlekan"),
+        "state" -> Seq("YourState"),
+        "scope" -> Seq("basic tasks")
       )
     )
   }
