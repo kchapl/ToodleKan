@@ -70,11 +70,13 @@ class Application @Inject()(components: ControllerComponents, ws: WSClient)
   }
 
   def showTasks(): Action[AnyContent] = Action.async { implicit request =>
-    Toodledo.fetchTasks(ws) map { tasks =>
-      Ok(tasks.toString)
-    } recover {
-      case e: Exception => InternalServerError(e.getMessage)
-    }
+    accessToken map { token =>
+      Toodledo.fetchTasks(ws, token) map { tasks =>
+        Ok(tasks.toString)
+      } recover {
+        case e: Exception => InternalServerError(e.getMessage)
+      }
+    } getOrElse Future.successful(Redirect(routes.Application.authenticate()))
   }
 }
 

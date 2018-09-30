@@ -23,6 +23,17 @@
                                             @for(ssg <- sg.subGoals) {
                                                 <tr>
                                                     <td>@ssg.name</td>
+                                                    <td>
+                                                        <table>
+                                                            <tbody>
+                                                            @for(t <- ssg.tasks) {
+                                                                <tr>
+                                                                    <td>@t.title</td>
+                                                                </tr>
+                                                            }
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
                                                 </tr>
                                             }
                                             </tbody>
