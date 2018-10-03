@@ -4,18 +4,19 @@ case class LifelongGoal(
     id: Long,
     name: String,
     note: String,
-    subGoals: Seq[LongTermGoal]
+    subGoals: Seq[LongTermGoal],
+    isArchived: Boolean
 )
 
 object LifelongGoal {
 
   def empty(subGoals: Seq[LongTermGoal]): LifelongGoal =
-    LifelongGoal(0, "***unknown***", "", subGoals)
+    LifelongGoal(0, "***unknown***", "", subGoals, isArchived = false)
 
   def fromGoals(goals: Seq[Goal]): Seq[LifelongGoal] = {
 
     val x = goals.filter { _.level == 0 }.map { goal =>
-      LifelongGoal(goal.id, goal.name, goal.note, Nil)
+      LifelongGoal(goal.id, goal.name, goal.note, Nil, isArchived = goal.archived)
     }
 
     x :+ empty(Nil)

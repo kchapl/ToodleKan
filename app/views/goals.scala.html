@@ -1,28 +1,32 @@
 @import model.LifelongGoal
 @(topLevel: Seq[LifelongGoal])
 
-<html>
+<!DOCTYPE html>
+<html lang="en">
     <head>
+        <meta charset="UTF-8">
         <title>Goals</title>
+        <link href="/assets/stylesheets/style.css" rel="stylesheet" type="text/css">
     </head>
     <body>
+
         <table>
             <tbody>
             @for(g <- topLevel) {
                 <tr>
-                    <td>@g.name</td>
+                    <td>@g.name<br />@if(g.isArchived){archived}else{active}</td>
                     <td>
                         <table>
                             <tbody>
                             @for(sg <- g.subGoals) {
                                 <tr>
-                                    <td>@sg.name</td>
+                                    <td>@sg.name<br />@if(g.isArchived){archived}else{active}</td>
                                     <td>
                                         <table>
                                             <tbody>
                                             @for(ssg <- sg.subGoals) {
                                                 <tr>
-                                                    <td>@ssg.name</td>
+                                                    <td>@ssg.name<br />@if(g.isArchived){archived}else{active}</td>
                                                     <td>
                                                         <table>
                                                             <tbody>
@@ -48,5 +52,6 @@
             }
         </tbody>
         </table>
+
     </body>
 </html>
