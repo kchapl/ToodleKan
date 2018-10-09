@@ -42,10 +42,6 @@ object Toodledo {
       .get() map { response =>
       response.status match {
         case 200 =>
-          println("*1")
-          println(response.json)
-          println("*2")
-
           response.json match {
             case JsArray(jsItems) =>
               TaskList(

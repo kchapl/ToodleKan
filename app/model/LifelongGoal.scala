@@ -22,26 +22,34 @@ object LifelongGoal {
     x :+ empty(Nil)
   }
 
-  def goalHierarchy(goals: Seq[Goal], tasks: Seq[Task]): Seq[LifelongGoal] = {
-    val x = fromGoals(goals)
-    val m = x map { u =>
-      val p = if (u.id == 0) Seq(LongTermGoal.empty(Nil)) else Nil
-      val r = LongTermGoal.subGoals(u, goals) ++ p
-      val g = r map { t =>
-        f(t, goals, tasks)
-      } filterNot (f => f.id == 0 && f.subGoals.isEmpty)
-      u.copy(subGoals = g)
-    }
-    m filterNot (f => f.id == 0 && f.subGoals.isEmpty)
+  def goalHierarchy(goals: Seq[Goal], tasks: Seq[Task]): Seq[LifelongGoal] =
+    fromGoals(goals) map filledLifelongGoal(goals, tasks) filterNot isUnknownAndEmpty
+
+  private def isUnknownAndEmpty(goal: LifelongGoal): Boolean =
+    goal.id == 0 && goal.subGoals.isEmpty
+
+  private def isUnknownAndEmpty(goal: LongTermGoal): Boolean =
+    goal.id == 0 && goal.subGoals.isEmpty
+
+  private def isUnknownAndEmpty(goal: ShortTermGoal): Boolean =
+    goal.id == 0 && goal.tasks.isEmpty
+
+  private def filledLifelongGoal(goals: Seq[Goal], tasks: Seq[Task])(
+      lifeLongGoal: LifelongGoal): LifelongGoal = {
+    val unknownLongTermGoals = if (lifeLongGoal.id == 0) Seq(LongTermGoal.empty(Nil)) else Nil
+    val longTermGoals = LongTermGoal.subGoals(lifeLongGoal, goals) ++ unknownLongTermGoals
+    lifeLongGoal.copy(
+      subGoals = longTermGoals map filledLongTermGoal(goals, tasks) filterNot isUnknownAndEmpty)
   }
 
-  private def f(parent: LongTermGoal, goals: Seq[Goal], tasks: Seq[Task]): LongTermGoal = {
-    val p = ShortTermGoal.subGoals(parent, goals)
-    val r = p map { s =>
+  private def filledLongTermGoal(goals: Seq[Goal], tasks: Seq[Task])(
+      parent: LongTermGoal): LongTermGoal = {
+    val unknownShortTermGoals = if (parent.id == 0) Seq(ShortTermGoal.empty(Nil)) else Nil
+    val shortTermGoals = ShortTermGoal.subGoals(parent, goals) ++ unknownShortTermGoals
+    val r = shortTermGoals map { s =>
       val h = tasks.filter(t => t.goalId == s.id)
-      val q = s.copy(tasks = h)
-      q
-    }
+      s.copy(tasks = h)
+    } filterNot isUnknownAndEmpty
     parent.copy(subGoals = r)
   }
 

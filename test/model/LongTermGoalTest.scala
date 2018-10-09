@@ -10,7 +10,7 @@ class LongTermGoalTest extends FunSpec with Matchers {
         Goal(1, "g1", 0, false, 0, "note"),
         Goal(2, "g2", 1, false, 1, "note")
       )
-      LongTermGoal.subGoals(LifelongGoal(1, "g1", "note", Nil), goals) shouldBe Seq(
+      LongTermGoal.subGoals(LifelongGoal(1, "g1", "note", Nil, isArchived = false), goals) shouldBe Seq(
         LongTermGoal(2, "g2", "note", Nil)
       )
     }

@@ -9,6 +9,8 @@ case class ShortTermGoal(
 
 object ShortTermGoal {
 
+  def empty(tasks: Seq[Task]) = ShortTermGoal(0, "***unknown***", "", tasks)
+
   def subGoals(parent: LongTermGoal, goals: Seq[Goal]): Seq[ShortTermGoal] =
     goals
       .filter { goal =>
