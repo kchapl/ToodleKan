@@ -14,25 +14,25 @@
             <tbody>
             @for(g <- topLevel) {
                 <tr>
-                    <td>@g.name<br />@if(g.isArchived){archived}else{active}</td>
+                    <td>@g.name<br />@g.note</td>
                     <td>
                         <table>
                             <tbody>
                             @for(sg <- g.subGoals) {
                                 <tr>
-                                    <td>@sg.name<br />@if(g.isArchived){archived}else{active}</td>
+                                    <td>@sg.name<br />@sg.note</td>
                                     <td>
                                         <table>
                                             <tbody>
                                             @for(ssg <- sg.subGoals) {
                                                 <tr>
-                                                    <td>@ssg.name<br />@if(g.isArchived){archived}else{active}</td>
+                                                    <td>@ssg.name<br />@ssg.note</td>
                                                     <td>
                                                         <table>
                                                             <tbody>
                                                             @for(t <- ssg.tasks) {
                                                                 <tr>
-                                                                    <td>@t.title</td>
+                                                                    <td @if(t.isCompleted){class="completed"}>@t.title</td>
                                                                 </tr>
                                                             }
                                                             </tbody>

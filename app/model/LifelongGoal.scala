@@ -13,26 +13,22 @@ object LifelongGoal {
   def empty(subGoals: Seq[LongTermGoal]): LifelongGoal =
     LifelongGoal(0, "***unknown***", "", subGoals, isArchived = false)
 
-  def fromGoals(goals: Seq[Goal]): Seq[LifelongGoal] = {
-
-    val x = goals.filter { _.level == 0 }.map { goal =>
+  def fromGoals(goals: Seq[Goal]): Seq[LifelongGoal] =
+    goals.filter { _.level == 0 }.map { goal =>
       LifelongGoal(goal.id, goal.name, goal.note, Nil, isArchived = goal.archived)
-    }
-
-    x :+ empty(Nil)
-  }
+    } :+ empty(Nil)
 
   def goalHierarchy(goals: Seq[Goal], tasks: Seq[Task]): Seq[LifelongGoal] =
     fromGoals(goals) map filledLifelongGoal(goals, tasks) filterNot isUnknownAndEmpty
 
   private def isUnknownAndEmpty(goal: LifelongGoal): Boolean =
-    goal.id == 0 && goal.subGoals.isEmpty
+    (goal.id == 0 && goal.subGoals.isEmpty) || goal.isArchived
 
   private def isUnknownAndEmpty(goal: LongTermGoal): Boolean =
-    goal.id == 0 && goal.subGoals.isEmpty
+    (goal.id == 0 && goal.subGoals.isEmpty) || goal.isArchived
 
-  private def isUnknownAndEmpty(goal: ShortTermGoal): Boolean =
-    goal.id == 0 && goal.tasks.isEmpty
+  private def isToBeOmitted(goal: ShortTermGoal): Boolean =
+    (goal.id == 0 && goal.tasks.isEmpty) || goal.isArchived
 
   private def filledLifelongGoal(goals: Seq[Goal], tasks: Seq[Task])(
       lifeLongGoal: LifelongGoal): LifelongGoal = {
@@ -46,12 +42,13 @@ object LifelongGoal {
       parent: LongTermGoal): LongTermGoal = {
     val unknownShortTermGoals = if (parent.id == 0) Seq(ShortTermGoal.empty(Nil)) else Nil
     val shortTermGoals = ShortTermGoal.subGoals(parent, goals) ++ unknownShortTermGoals
-    val r = shortTermGoals map { s =>
-      val h = tasks.filter(t => t.goalId == s.id)
-      s.copy(tasks = h)
-    } filterNot isUnknownAndEmpty
-    parent.copy(subGoals = r)
+    parent.copy(
+      subGoals = shortTermGoals map filledShortTermGoal(tasks) filterNot isToBeOmitted
+    )
   }
+
+  private def filledShortTermGoal(tasks: Seq[Task])(goal: ShortTermGoal): ShortTermGoal =
+    goal.copy(tasks = tasks.filter(_.goalId == goal.id))
 
   def fromGoals(goals: Seq[Goal], longTermGoals: Seq[LongTermGoal]): Seq[LifelongGoal] = ???
 }
