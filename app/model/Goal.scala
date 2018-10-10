@@ -22,5 +22,6 @@ object Goal {
       (__ \ "note").read[String]
   )(Goal.apply _)
 
-  def toLongTermGoal(goal: Goal): LongTermGoal = LongTermGoal(goal.id, goal.name, goal.note, Nil)
+  def toLongTermGoal(goal: Goal): LongTermGoal =
+    LongTermGoal(goal.id, goal.name, goal.note, goal.archived, Nil)
 }

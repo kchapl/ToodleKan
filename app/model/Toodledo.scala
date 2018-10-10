@@ -32,25 +32,27 @@ object Toodledo {
     fetch[Context](ws, accessToken = "", path = "contexts")
 
   def fetchGoals(ws: WSClient, accessToken: String): Future[Seq[LifelongGoal]] =
-    fetch[Goal](ws, accessToken, path = "goals") map { LifelongGoal.fromGoals }
+    for {
+      goals <- fetch[Goal](ws, accessToken, path = "goals")
+      tasks <- fetchTasks(ws, accessToken)
+    } yield LifelongGoal.goalHierarchy(goals, tasks.tasks)
 
-  def fetchTasks(ws: WSClient): Future[TaskList] = {
-    val accessToken = generateAccessToken()
-    ws.url(s"https://api.toodledo.com/3/tasks/get.php?access_token=$accessToken").get() map {
-      response =>
-        response.status match {
-          case 200 =>
-            response.json match {
-              case JsArray(jsItems) =>
-                TaskList(
-                  (jsItems.head \ "num").as[Int],
-                  (jsItems.head \ "total").as[Int],
-                  jsItems.tail.map(_.as[Task]))
-              case _ => TaskList(0, 0, Nil)
-            }
-          case _ =>
-            throw response.json.as[ToodledoException]
-        }
+  def fetchTasks(ws: WSClient, accessToken: String): Future[TaskList] = {
+    ws.url(s"https://api.toodledo.com/3/tasks/get.php?access_token=$accessToken&fields=goal")
+      .get() map { response =>
+      response.status match {
+        case 200 =>
+          response.json match {
+            case JsArray(jsItems) =>
+              TaskList(
+                (jsItems.head \ "num").as[Int],
+                (jsItems.head \ "total").as[Int],
+                jsItems.tail.map(_.as[Task]))
+            case _ => TaskList(0, 0, Nil)
+          }
+        case _ =>
+          throw response.json.as[ToodledoException]
+      }
     }
   }
 

@@ -1,28 +1,43 @@
 @import model.LifelongGoal
 @(topLevel: Seq[LifelongGoal])
 
-<html>
+<!DOCTYPE html>
+<html lang="en">
     <head>
+        <meta charset="UTF-8">
         <title>Goals</title>
+        <link href="/assets/stylesheets/style.css" rel="stylesheet" type="text/css">
     </head>
     <body>
+
         <table>
             <tbody>
             @for(g <- topLevel) {
                 <tr>
-                    <td>@g.name</td>
+                    <td>@g.name<br />@g.note</td>
                     <td>
                         <table>
                             <tbody>
                             @for(sg <- g.subGoals) {
                                 <tr>
-                                    <td>@sg.name</td>
+                                    <td>@sg.name<br />@sg.note</td>
                                     <td>
                                         <table>
                                             <tbody>
                                             @for(ssg <- sg.subGoals) {
                                                 <tr>
-                                                    <td>@ssg.name</td>
+                                                    <td>@ssg.name<br />@ssg.note</td>
+                                                    <td>
+                                                        <table>
+                                                            <tbody>
+                                                            @for(t <- ssg.tasks) {
+                                                                <tr>
+                                                                    <td @if(t.isCompleted){class="completed"}>@t.title</td>
+                                                                </tr>
+                                                            }
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
                                                 </tr>
                                             }
                                             </tbody>
@@ -37,5 +52,6 @@
             }
         </tbody>
         </table>
+
     </body>
 </html>

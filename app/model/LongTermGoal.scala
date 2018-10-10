@@ -5,12 +5,14 @@ case class LongTermGoal(
     id: Long,
     name: String,
     note: String,
+    isArchived: Boolean,
     subGoals: Seq[ShortTermGoal]
 )
 
 object LongTermGoal {
 
-  def empty(subGoals: Seq[ShortTermGoal]) = LongTermGoal(0, "***unknown***", "", subGoals)
+  def empty(subGoals: Seq[ShortTermGoal]) =
+    LongTermGoal(0, "***unknown***", "", isArchived = false, subGoals)
 
   def subGoals(parent: LifelongGoal, goals: Seq[Goal]): Seq[LongTermGoal] = {
 
