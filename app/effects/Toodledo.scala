@@ -1,5 +1,6 @@
-package model
+package effects
 
+import model._
 import play.api.libs.json.{JsArray, Reads}
 import play.api.libs.ws.WSClient
 

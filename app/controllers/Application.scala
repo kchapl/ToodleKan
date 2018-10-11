@@ -1,7 +1,7 @@
 package controllers
 
+import effects.Toodledo
 import javax.inject.Inject
-import model.Toodledo
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 
@@ -28,7 +28,7 @@ class Application @Inject()(components: ControllerComponents, ws: WSClient)
     }
   }
 
-  def showFolders(): Action[AnyContent] = Action.async { implicit request =>
+  def showFolders(): Action[AnyContent] = Action.async { _ =>
     Toodledo.fetchFolders(ws) map { folders =>
       Ok(folders.toString())
     } recover {
@@ -36,7 +36,7 @@ class Application @Inject()(components: ControllerComponents, ws: WSClient)
     }
   }
 
-  def showContexts(): Action[AnyContent] = Action.async { implicit request =>
+  def showContexts(): Action[AnyContent] = Action.async { _ =>
     Toodledo.fetchContexts(ws) map { contexts =>
       Ok(contexts.toString())
     } recover {

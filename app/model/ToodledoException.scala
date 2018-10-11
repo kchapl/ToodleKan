@@ -9,7 +9,7 @@ case class ToodledoException(code: Int, description: String) extends Exception {
 
 object ToodledoException {
 
-  implicit val jsonReads = (
+  implicit val jsonReads: Reads[ToodledoException] = (
     (__ \ "errorCode").read[Int] and
       (__ \ "errorDesc").read[String]
   )(ToodledoException.apply _)
