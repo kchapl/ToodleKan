@@ -49,8 +49,11 @@ object LifelongGoal {
 
   private def filledShortTermGoal(tasks: Seq[Task])(goal: ShortTermGoal): ShortTermGoal =
     goal.copy(
-      tasks = tasks.filter(_.goalId == goal.id).sortBy(task => (!task.isCompleted, task.completed))
+      tasks = tasks.filter(isIncludedTask(goal)).sortBy(task => (!task.isCompleted, task.completed))
     )
+
+  private def isIncludedTask(goal: ShortTermGoal)(task: Task): Boolean =
+    task.goalId == goal.id && (task.goalId != 0 || !task.isCompleted)
 
   def fromGoals(goals: Seq[Goal], longTermGoals: Seq[LongTermGoal]): Seq[LifelongGoal] = ???
 }

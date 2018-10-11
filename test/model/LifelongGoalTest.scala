@@ -231,4 +231,32 @@ class LifelongGoalTest extends FlatSpec with Matchers {
                 ))))))
     )
   }
+
+  it should "omit completed tasks that have no goal" in {
+    val goals = Seq(Goal(1, "short-term", 2, archived = false, 0, "note"))
+    val tasks = Seq(
+      Task(7, "task7", 1, completed = 19000),
+      Task(8, "task8", 0, completed = 900),
+      Task(9, "task9", 0, completed = 0)
+    )
+    LifelongGoal.goalHierarchy(goals, tasks) shouldBe Seq(
+      LifelongGoal.empty(
+        Seq(
+          LongTermGoal.empty(
+            Seq(
+              ShortTermGoal(
+                1,
+                "short-term",
+                "note",
+                isArchived = false,
+                Seq(
+                  Task(7, "task7", 1, completed = 19000),
+                )),
+              ShortTermGoal.empty(Seq(
+                Task(9, "task9", 0, completed = 0)
+              ))
+            ))
+        ))
+    )
+  }
 }
