@@ -1,4 +1,5 @@
 package model
+import java.time.LocalDate
 
 case class LifelongGoal(
     id: Long,
@@ -53,7 +54,7 @@ object LifelongGoal {
     )
 
   private def isIncludedTask(goal: ShortTermGoal)(task: Task): Boolean =
-    task.goalId == goal.id && (task.goalId != 0 || !task.isCompleted)
-
-  def fromGoals(goals: Seq[Goal], longTermGoals: Seq[LongTermGoal]): Seq[LifelongGoal] = ???
+    task.goalId == goal.id &&
+      (task.goalId != 0 || !task.isCompleted) &&
+      task.due.forall(_.isBefore(LocalDate.now.plusMonths(1)))
 }

@@ -1,5 +1,7 @@
 package model
 
+import java.time.LocalDate
+
 import org.scalatest.{FlatSpec, Matchers}
 
 class LifelongGoalTest extends FlatSpec with Matchers {
@@ -176,7 +178,7 @@ class LifelongGoalTest extends FlatSpec with Matchers {
 
   it should "generate correct hierarchy of goals and tasks" in {
     val goals = Seq(Goal(1, "short-term", 2, archived = false, 0, "note"))
-    val tasks = Seq(Task(7, "task", 1, completed = 0))
+    val tasks = Seq(Task(7, "task", 1, completed = 0, due = None))
     LifelongGoal.goalHierarchy(goals, tasks) shouldBe Seq(
       LifelongGoal.empty(
         Seq(
@@ -187,73 +189,92 @@ class LifelongGoalTest extends FlatSpec with Matchers {
                 "short-term",
                 "note",
                 isArchived = false,
-                Seq(Task(7, "task", 1, completed = 0))))
+                Seq(Task(7, "task", 1, completed = 0, due = None))))
           )))
     )
   }
 
   it should "generate correct hierarchy of orphan tasks" in {
     val goals = Nil
-    val tasks = Seq(Task(1, "task", 0, completed = 0))
+    val tasks = Seq(Task(1, "task", 0, completed = 0, due = None))
     LifelongGoal.goalHierarchy(goals, tasks) shouldBe Seq(
       LifelongGoal.empty(
-        Seq(LongTermGoal.empty(Seq(ShortTermGoal.empty(Seq(Task(1, "task", 0, completed = 0)))))))
+        Seq(LongTermGoal.empty(
+          Seq(ShortTermGoal.empty(Seq(Task(1, "task", 0, completed = 0, due = None)))))))
     )
   }
 
   it should "omit archived goals" in {
     val goals = Seq(Goal(1, "short-term", 2, archived = true, 0, "note"))
-    val tasks = Seq(Task(7, "task", 1, completed = 0))
+    val tasks = Seq(Task(7, "task", 1, completed = 0, due = None))
     LifelongGoal.goalHierarchy(goals, tasks) shouldBe Nil
   }
 
   it should "sort tasks by date completed" in {
     val goals = Seq(Goal(1, "short-term", 2, archived = false, 0, "note"))
     val tasks = Seq(
-      Task(7, "task7", 1, completed = 19000),
-      Task(8, "task8", 1, completed = 900),
-      Task(9, "task9", 1, completed = 0)
+      Task(7, "task7", 1, completed = 19000, due = None),
+      Task(8, "task8", 1, completed = 900, due = None),
+      Task(9, "task9", 1, completed = 0, due = None)
     )
     LifelongGoal.goalHierarchy(goals, tasks) shouldBe Seq(
       LifelongGoal.empty(
-        Seq(
-          LongTermGoal.empty(
-            Seq(
-              ShortTermGoal(
-                1,
-                "short-term",
-                "note",
-                isArchived = false,
-                Seq(
-                  Task(8, "task8", 1, completed = 900),
-                  Task(7, "task7", 1, completed = 19000),
-                  Task(9, "task9", 1, completed = 0)
-                ))))))
+        Seq(LongTermGoal.empty(Seq(ShortTermGoal(
+          1,
+          "short-term",
+          "note",
+          isArchived = false,
+          Seq(
+            Task(8, "task8", 1, completed = 900, due = None),
+            Task(7, "task7", 1, completed = 19000, due = None),
+            Task(9, "task9", 1, completed = 0, due = None)
+          )
+        )))))
     )
   }
 
   it should "omit completed tasks that have no goal" in {
     val goals = Seq(Goal(1, "short-term", 2, archived = false, 0, "note"))
     val tasks = Seq(
-      Task(7, "task7", 1, completed = 19000),
-      Task(8, "task8", 0, completed = 900),
-      Task(9, "task9", 0, completed = 0)
+      Task(7, "task7", 1, completed = 19000, due = None),
+      Task(8, "task8", 0, completed = 900, due = None),
+      Task(9, "task9", 0, completed = 0, due = None)
+    )
+    LifelongGoal.goalHierarchy(goals, tasks) shouldBe Seq(
+      LifelongGoal.empty(
+        Seq(
+          LongTermGoal.empty(Seq(
+            ShortTermGoal(
+              1,
+              "short-term",
+              "note",
+              isArchived = false,
+              Seq(
+                Task(7, "task7", 1, completed = 19000, due = None),
+              )),
+            ShortTermGoal.empty(Seq(
+              Task(9, "task9", 0, completed = 0, due = None)
+            ))
+          ))
+        ))
+    )
+  }
+
+  it should "omit tasks that are due in over a month" in {
+    val today = LocalDate.now
+    val goals = Nil
+    val tasks = Seq(
+      Task(7, "task7", 0, completed = 0, due = Some(today)),
+      Task(8, "task8", 0, completed = 0, due = Some(today.plusMonths(2))),
+      Task(9, "task9", 0, completed = 0, due = Some(today.plusMonths(1)))
     )
     LifelongGoal.goalHierarchy(goals, tasks) shouldBe Seq(
       LifelongGoal.empty(
         Seq(
           LongTermGoal.empty(
             Seq(
-              ShortTermGoal(
-                1,
-                "short-term",
-                "note",
-                isArchived = false,
-                Seq(
-                  Task(7, "task7", 1, completed = 19000),
-                )),
               ShortTermGoal.empty(Seq(
-                Task(9, "task9", 0, completed = 0)
+                Task(7, "task7", 0, completed = 0, due = Some(today)),
               ))
             ))
         ))
