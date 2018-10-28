@@ -1,5 +1,6 @@
 package effects
 
+import model.ToodledoUrl.tasksFetch
 import model._
 import play.api.libs.json.{JsArray, Reads}
 import play.api.libs.ws.WSClient
@@ -39,7 +40,7 @@ object Toodledo {
     } yield LifelongGoal.goalHierarchy(goals, tasks.tasks)
 
   def fetchTasks(ws: WSClient, accessToken: String): Future[TaskList] = {
-    ws.url(s"https://api.toodledo.com/3/tasks/get.php?access_token=$accessToken&fields=goal")
+    ws.url(tasksFetch(accessToken))
       .get() map { response =>
       response.status match {
         case 200 =>
