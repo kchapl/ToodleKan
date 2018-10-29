@@ -12,11 +12,15 @@ case class Task(id: Long, title: String, goalId: Long, completed: Long, due: Opt
 
 object Task {
 
-  implicit val jsonReads: Reads[Task] = (
+  private def toDate(time: Long): Option[LocalDate] =
+    if (time == 0) None
+    else Some(new Timestamp(time * 1000).toLocalDateTime.toLocalDate)
+
+  implicit val reads: Reads[Task] = (
     (__ \ "id").read[Long] and
       (__ \ "title").read[String] and
       (__ \ "goal").read[Long] and
       (__ \ "completed").read[Long] and
-      (__ \ "duedate").readNullable[Long].map(_.map(new Timestamp(_).toLocalDateTime.toLocalDate))
+      (__ \ "duedate").read[Long].map(toDate)
   )(Task.apply _)
 }
