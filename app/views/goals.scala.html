@@ -31,9 +31,7 @@
                                                         <table>
                                                             <tbody>
                                                             @for(t <- ssg.tasks) {
-                                                                <tr>
-                                                                    <td @if(t.isCompleted){class="completed"}>@t.title</td>
-                                                                </tr>
+                                                              @views.html.goalTask(t)
                                                             }
                                                             </tbody>
                                                         </table>

@@ -178,7 +178,7 @@ class LifelongGoalTest extends FlatSpec with Matchers {
 
   it should "generate correct hierarchy of goals and tasks" in {
     val goals = Seq(Goal(1, "short-term", 2, archived = false, 0, "note"))
-    val tasks = Seq(Task(7, "task", 1, completed = 0, due = None))
+    val tasks = Seq(Task(7, "task", 1, completed = 0, due = None, hasStar = false))
     LifelongGoal.goalHierarchy(goals, tasks) shouldBe Seq(
       LifelongGoal.empty(
         Seq(
@@ -189,33 +189,37 @@ class LifelongGoalTest extends FlatSpec with Matchers {
                 "short-term",
                 "note",
                 isArchived = false,
-                Seq(Task(7, "task", 1, completed = 0, due = None))))
+                Seq(Task(7, "task", 1, completed = 0, due = None, hasStar = false))))
           )))
     )
   }
 
   it should "generate correct hierarchy of orphan tasks" in {
     val goals = Nil
-    val tasks = Seq(Task(1, "task", 0, completed = 0, due = None))
+    val tasks = Seq(Task(1, "task", 0, completed = 0, due = None, hasStar = false))
     LifelongGoal.goalHierarchy(goals, tasks) shouldBe Seq(
       LifelongGoal.empty(
-        Seq(LongTermGoal.empty(
-          Seq(ShortTermGoal.empty(Seq(Task(1, "task", 0, completed = 0, due = None)))))))
+        Seq(
+          LongTermGoal.empty(
+            Seq(ShortTermGoal.empty(
+              Seq(Task(1, "task", 0, completed = 0, due = None, hasStar = false))))
+          ))
+      )
     )
   }
 
   it should "omit archived goals" in {
     val goals = Seq(Goal(1, "short-term", 2, archived = true, 0, "note"))
-    val tasks = Seq(Task(7, "task", 1, completed = 0, due = None))
+    val tasks = Seq(Task(7, "task", 1, completed = 0, due = None, hasStar = false))
     LifelongGoal.goalHierarchy(goals, tasks) shouldBe Nil
   }
 
   it should "sort tasks by date completed" in {
     val goals = Seq(Goal(1, "short-term", 2, archived = false, 0, "note"))
     val tasks = Seq(
-      Task(7, "task7", 1, completed = 19000, due = None),
-      Task(8, "task8", 1, completed = 900, due = None),
-      Task(9, "task9", 1, completed = 0, due = None)
+      Task(7, "task7", 1, completed = 19000, due = None, hasStar = false),
+      Task(8, "task8", 1, completed = 900, due = None, hasStar = false),
+      Task(9, "task9", 1, completed = 0, due = None, hasStar = false)
     )
     LifelongGoal.goalHierarchy(goals, tasks) shouldBe Seq(
       LifelongGoal.empty(
@@ -225,9 +229,9 @@ class LifelongGoalTest extends FlatSpec with Matchers {
           "note",
           isArchived = false,
           Seq(
-            Task(8, "task8", 1, completed = 900, due = None),
-            Task(7, "task7", 1, completed = 19000, due = None),
-            Task(9, "task9", 1, completed = 0, due = None)
+            Task(8, "task8", 1, completed = 900, due = None, hasStar = false),
+            Task(7, "task7", 1, completed = 19000, due = None, hasStar = false),
+            Task(9, "task9", 1, completed = 0, due = None, hasStar = false)
           )
         )))))
     )
@@ -236,9 +240,9 @@ class LifelongGoalTest extends FlatSpec with Matchers {
   it should "omit completed tasks that have no goal" in {
     val goals = Seq(Goal(1, "short-term", 2, archived = false, 0, "note"))
     val tasks = Seq(
-      Task(7, "task7", 1, completed = 19000, due = None),
-      Task(8, "task8", 0, completed = 900, due = None),
-      Task(9, "task9", 0, completed = 0, due = None)
+      Task(7, "task7", 1, completed = 19000, due = None, hasStar = false),
+      Task(8, "task8", 0, completed = 900, due = None, hasStar = false),
+      Task(9, "task9", 0, completed = 0, due = None, hasStar = false)
     )
     LifelongGoal.goalHierarchy(goals, tasks) shouldBe Seq(
       LifelongGoal.empty(
@@ -250,10 +254,10 @@ class LifelongGoalTest extends FlatSpec with Matchers {
               "note",
               isArchived = false,
               Seq(
-                Task(7, "task7", 1, completed = 19000, due = None),
+                Task(7, "task7", 1, completed = 19000, due = None, hasStar = false),
               )),
             ShortTermGoal.empty(Seq(
-              Task(9, "task9", 0, completed = 0, due = None)
+              Task(9, "task9", 0, completed = 0, due = None, hasStar = false)
             ))
           ))
         ))
@@ -264,9 +268,9 @@ class LifelongGoalTest extends FlatSpec with Matchers {
     val today = LocalDate.now
     val goals = Nil
     val tasks = Seq(
-      Task(7, "task7", 0, completed = 0, due = Some(today)),
-      Task(8, "task8", 0, completed = 0, due = Some(today.plusMonths(2))),
-      Task(9, "task9", 0, completed = 0, due = Some(today.plusMonths(1)))
+      Task(7, "task7", 0, completed = 0, due = Some(today), hasStar = false),
+      Task(8, "task8", 0, completed = 0, due = Some(today.plusMonths(2)), hasStar = false),
+      Task(9, "task9", 0, completed = 0, due = Some(today.plusMonths(1)), hasStar = false)
     )
     LifelongGoal.goalHierarchy(goals, tasks) shouldBe Seq(
       LifelongGoal.empty(
@@ -274,7 +278,7 @@ class LifelongGoalTest extends FlatSpec with Matchers {
           LongTermGoal.empty(
             Seq(
               ShortTermGoal.empty(Seq(
-                Task(7, "task7", 0, completed = 0, due = Some(today)),
+                Task(7, "task7", 0, completed = 0, due = Some(today), hasStar = false),
               ))
             ))
         ))

@@ -1,0 +1,5 @@
+@(task: model.Task)
+
+<tr>
+    <td @if(task.isCompleted){class="completed"}>@if(task.hasStar){<span class="highlighted">}@task.title@if(task.hasStar){</span>}</td>
+</tr>

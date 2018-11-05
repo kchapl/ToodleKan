@@ -16,3 +16,7 @@ tr, td {
 .completed {
     text-decoration: wavy line-through;
 }
+
+.highlighted {
+    background-color: yellow;
+}

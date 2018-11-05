@@ -6,7 +6,13 @@ import java.time.LocalDate
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
-case class Task(id: Long, title: String, goalId: Long, completed: Long, due: Option[LocalDate]) {
+case class Task(
+    id: Long,
+    title: String,
+    goalId: Long,
+    completed: Long,
+    due: Option[LocalDate],
+    hasStar: Boolean) {
   val isCompleted: Boolean = completed != 0
 }
 
@@ -21,6 +27,7 @@ object Task {
       (__ \ "title").read[String] and
       (__ \ "goal").read[Long] and
       (__ \ "completed").read[Long] and
-      (__ \ "duedate").read[Long].map(toDate)
+      (__ \ "duedate").read[Long].map(toDate) and
+      (__ \ "star").read[Int].map(_ == 1)
   )(Task.apply _)
 }
