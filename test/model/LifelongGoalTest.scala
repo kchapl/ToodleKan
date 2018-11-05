@@ -214,12 +214,13 @@ class LifelongGoalTest extends FlatSpec with Matchers {
     LifelongGoal.goalHierarchy(goals, tasks) shouldBe Nil
   }
 
-  it should "sort tasks by date completed" in {
+  it should "sort tasks by date completed and then star" in {
     val goals = Seq(Goal(1, "short-term", 2, archived = false, 0, "note"))
     val tasks = Seq(
       Task(7, "task7", 1, completed = 19000, due = None, hasStar = false),
       Task(8, "task8", 1, completed = 900, due = None, hasStar = false),
-      Task(9, "task9", 1, completed = 0, due = None, hasStar = false)
+      Task(9, "task9", 1, completed = 0, due = None, hasStar = false),
+      Task(10, "task10", 1, completed = 0, due = None, hasStar = true)
     )
     LifelongGoal.goalHierarchy(goals, tasks) shouldBe Seq(
       LifelongGoal.empty(
@@ -231,6 +232,7 @@ class LifelongGoalTest extends FlatSpec with Matchers {
           Seq(
             Task(8, "task8", 1, completed = 900, due = None, hasStar = false),
             Task(7, "task7", 1, completed = 19000, due = None, hasStar = false),
+            Task(10, "task10", 1, completed = 0, due = None, hasStar = true),
             Task(9, "task9", 1, completed = 0, due = None, hasStar = false)
           )
         )))))
