@@ -1,6 +1,8 @@
 package model
 import java.time.LocalDate
 
+import model.Goal.emptyGoalName
+
 case class LifelongGoal(
     id: Long,
     name: String,
@@ -12,7 +14,7 @@ case class LifelongGoal(
 object LifelongGoal {
 
   def empty(subGoals: Seq[LongTermGoal]): LifelongGoal =
-    LifelongGoal(0, "***unknown***", "", subGoals, isArchived = false)
+    LifelongGoal(0, emptyGoalName, "", subGoals, isArchived = false)
 
   def fromGoals(goals: Seq[Goal]): Seq[LifelongGoal] =
     goals.filter { _.level == 0 }.map { goal =>

@@ -1,4 +1,5 @@
 package model
+import model.Goal.emptyGoalName
 
 case class ShortTermGoal(
     id: Long,
@@ -10,7 +11,7 @@ case class ShortTermGoal(
 
 object ShortTermGoal {
 
-  def empty(tasks: Seq[Task]) = ShortTermGoal(0, "***unknown***", "", isArchived = false, tasks)
+  def empty(tasks: Seq[Task]) = ShortTermGoal(0, emptyGoalName, "", isArchived = false, tasks)
 
   def subGoals(parent: LongTermGoal, goals: Seq[Goal]): Seq[ShortTermGoal] =
     goals

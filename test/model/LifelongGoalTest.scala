@@ -286,4 +286,8 @@ class LifelongGoalTest extends FlatSpec with Matchers {
         ))
     )
   }
+
+  "empty" should "have correct goal name" in {
+    LifelongGoal.empty(Nil).name shouldBe "No goal"
+  }
 }

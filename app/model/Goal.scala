@@ -13,6 +13,8 @@ case class Goal(
 
 object Goal {
 
+  val emptyGoalName = "No goal"
+
   implicit val jsonReads = (
     (__ \ "id").read[Long] and
       (__ \ "name").read[String] and

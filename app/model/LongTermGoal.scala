@@ -1,5 +1,5 @@
 package model
-import model.Goal.toLongTermGoal
+import model.Goal.{emptyGoalName, toLongTermGoal}
 
 case class LongTermGoal(
     id: Long,
@@ -12,7 +12,7 @@ case class LongTermGoal(
 object LongTermGoal {
 
   def empty(subGoals: Seq[ShortTermGoal]) =
-    LongTermGoal(0, "***unknown***", "", isArchived = false, subGoals)
+    LongTermGoal(0, emptyGoalName, "", isArchived = false, subGoals)
 
   def subGoals(parent: LifelongGoal, goals: Seq[Goal]): Seq[LongTermGoal] = {
 
