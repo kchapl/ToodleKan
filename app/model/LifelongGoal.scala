@@ -34,15 +34,18 @@ object LifelongGoal {
     (goal.id == 0 && goal.tasks.isEmpty) || goal.isArchived
 
   private def filledLifelongGoal(goals: Seq[Goal], tasks: Seq[Task])(
-      lifeLongGoal: LifelongGoal): LifelongGoal = {
+      lifeLongGoal: LifelongGoal
+  ): LifelongGoal = {
     val unknownLongTermGoals = if (lifeLongGoal.id == 0) Seq(LongTermGoal.empty(Nil)) else Nil
     val longTermGoals = LongTermGoal.subGoals(lifeLongGoal, goals) ++ unknownLongTermGoals
     lifeLongGoal.copy(
-      subGoals = longTermGoals map filledLongTermGoal(goals, tasks) filterNot isUnknownAndEmpty)
+      subGoals = longTermGoals map filledLongTermGoal(goals, tasks) filterNot isUnknownAndEmpty
+    )
   }
 
   private def filledLongTermGoal(goals: Seq[Goal], tasks: Seq[Task])(
-      parent: LongTermGoal): LongTermGoal = {
+      parent: LongTermGoal
+  ): LongTermGoal = {
     val unknownShortTermGoals = if (parent.id == 0) Seq(ShortTermGoal.empty(Nil)) else Nil
     val shortTermGoals = ShortTermGoal.subGoals(parent, goals) ++ unknownShortTermGoals
     parent.copy(

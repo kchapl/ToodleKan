@@ -9,7 +9,8 @@ case class Goal(
     level: Int,
     archived: Boolean,
     contributes: Long,
-    note: String)
+    note: String
+)
 
 object Goal {
 

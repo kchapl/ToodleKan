@@ -18,7 +18,8 @@ class TaskTest extends FlatSpec with Matchers {
         completed = 1540641600,
         due = Some(LocalDate.of(2018, 10, 26)),
         hasStar = false
-      ))
+      )
+    )
   }
 
   it should "read task without a due date correctly" in {
@@ -32,7 +33,8 @@ class TaskTest extends FlatSpec with Matchers {
         completed = 0,
         due = None,
         hasStar = false
-      ))
+      )
+    )
   }
 
   it should "read starred task correctly" in {
@@ -46,6 +48,7 @@ class TaskTest extends FlatSpec with Matchers {
         completed = 0,
         due = None,
         hasStar = true
-      ))
+      )
+    )
   }
 }

@@ -9,7 +9,7 @@ import play.api.mvc._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Random
 
-class AuthorizationController @Inject()(components: ControllerComponents, ws: WSClient)
+class AuthorizationController @Inject() (components: ControllerComponents, ws: WSClient)
     extends AbstractController(components) {
 
   implicit val authorizationReads: Reads[Authorization] = (
@@ -39,7 +39,8 @@ class AuthorizationController @Inject()(components: ControllerComponents, ws: WS
           Map(
             "grant_type" -> Seq("authorization_code"),
             "code" -> Seq(code)
-          ))
+          )
+        )
 
       val z = for {
         y <- x
@@ -67,10 +68,10 @@ class AuthorizationController @Inject()(components: ControllerComponents, ws: WS
 
     Action { request =>
       //  val x = getAccessToken(request).map(token => action(token)(request)).get
-      //x
-      //x.getOrElse {
+      // x
+      // x.getOrElse {
       Unauthorized
-      //}
+      // }
     }
 
   }
@@ -86,4 +87,5 @@ case class Authorization(
     expiresIn: Int,
     tokenType: String,
     scope: String,
-    refreshToken: String)
+    refreshToken: String
+)
