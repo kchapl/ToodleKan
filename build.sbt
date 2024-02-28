@@ -9,7 +9,7 @@ scalaVersion := "2.12.19"
 libraryDependencies ++= Seq(
   guice,
   ws,
-  "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.3" % Test
+  "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % Test
 )
 
 scalafmtOnCompile := true
