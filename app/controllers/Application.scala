@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Random
 
-class Application @Inject()(components: ControllerComponents, ws: WSClient)
+class Application @Inject() (components: ControllerComponents, ws: WSClient)
     extends AbstractController(components) {
 
   def index2 = Action { implicit request =>
@@ -23,7 +23,8 @@ class Application @Inject()(components: ControllerComponents, ws: WSClient)
       val state = rnd
       Redirect(
         s"https://api.toodledo.com/3/account/authorize" +
-          s".php?response_type=code&client_id=$clientId&state=$state&scope=basic")
+          s".php?response_type=code&client_id=$clientId&state=$state&scope=basic"
+      )
         .addingToSession("state" -> state)
     }
   }
@@ -31,16 +32,16 @@ class Application @Inject()(components: ControllerComponents, ws: WSClient)
   def showFolders(): Action[AnyContent] = Action.async { _ =>
     Toodledo.fetchFolders(ws) map { folders =>
       Ok(folders.toString())
-    } recover {
-      case e: Exception => InternalServerError(e.getMessage)
+    } recover { case e: Exception =>
+      InternalServerError(e.getMessage)
     }
   }
 
   def showContexts(): Action[AnyContent] = Action.async { _ =>
     Toodledo.fetchContexts(ws) map { contexts =>
       Ok(contexts.toString())
-    } recover {
-      case e: Exception => InternalServerError(e.getMessage)
+    } recover { case e: Exception =>
+      InternalServerError(e.getMessage)
     }
   }
 
@@ -63,8 +64,8 @@ class Application @Inject()(components: ControllerComponents, ws: WSClient)
     accessToken map { token =>
       Toodledo.fetchGoals(ws, token) map { goals =>
         Ok(views.html.goals(goals))
-      } recover {
-        case e: Exception => InternalServerError(e.getMessage)
+      } recover { case e: Exception =>
+        InternalServerError(e.getMessage)
       }
     } getOrElse Future.successful(Redirect(routes.Application.authenticate()))
   }
@@ -73,8 +74,8 @@ class Application @Inject()(components: ControllerComponents, ws: WSClient)
     accessToken map { token =>
       Toodledo.fetchTasks(ws, token) map { tasks =>
         Ok(tasks.toString)
-      } recover {
-        case e: Exception => InternalServerError(e.getMessage)
+      } recover { case e: Exception =>
+        InternalServerError(e.getMessage)
       }
     } getOrElse Future.successful(Redirect(routes.Application.authenticate()))
   }

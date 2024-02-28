@@ -12,7 +12,8 @@ case class Task(
     goalId: Long,
     completed: Long,
     due: Option[LocalDate],
-    hasStar: Boolean) {
+    hasStar: Boolean
+) {
   val isCompleted: Boolean = completed != 0
 }
 

@@ -14,7 +14,8 @@ object Toodledo {
       ws: WSClient,
       accessToken: String,
       path: String,
-      sort: Option[T => Int] = None)(implicit tReads: Reads[T]): Future[Seq[T]] = {
+      sort: Option[T => Int] = None
+  )(implicit tReads: Reads[T]): Future[Seq[T]] = {
     ws.url(s"https://api.toodledo.com/3/$path/get.php?access_token=$accessToken").get() map {
       response =>
         response.status match {
@@ -49,7 +50,8 @@ object Toodledo {
               TaskList(
                 (jsItems.head \ "num").as[Int],
                 (jsItems.head \ "total").as[Int],
-                jsItems.tail.map(_.as[Task]))
+                jsItems.tail.map(_.as[Task])
+              )
             case _ => TaskList(0, 0, Nil)
           }
         case _ =>

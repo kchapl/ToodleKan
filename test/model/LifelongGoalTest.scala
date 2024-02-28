@@ -11,7 +11,8 @@ class LifelongGoalTest extends FlatSpec with Matchers {
       Goal(1, "name", 0, archived = false, 0, "note")
     )
     LifelongGoal.goalHierarchy(goals, Nil) shouldBe Seq(
-      LifelongGoal(1, "name", "note", Nil, isArchived = false))
+      LifelongGoal(1, "name", "note", Nil, isArchived = false)
+    )
   }
 
   it should "generate correct hierarchy from lifelong goal with long-term goal" in {
@@ -25,7 +26,8 @@ class LifelongGoalTest extends FlatSpec with Matchers {
         "name",
         "note",
         Seq(LongTermGoal(2, "name", "note", isArchived = false, Nil)),
-        isArchived = false)
+        isArchived = false
+      )
     )
   }
 
@@ -46,7 +48,9 @@ class LifelongGoalTest extends FlatSpec with Matchers {
             "name",
             "note",
             isArchived = false,
-            Seq(ShortTermGoal(3, "name", "note", isArchived = false, Nil)))),
+            Seq(ShortTermGoal(3, "name", "note", isArchived = false, Nil))
+          )
+        ),
         isArchived = false
       )
     )
@@ -63,14 +67,15 @@ class LifelongGoalTest extends FlatSpec with Matchers {
       LifelongGoal.empty(
         Seq(
           LongTermGoal(2, "long-term1", "note", isArchived = false, Nil),
-          LongTermGoal(3, "long-term2", "note", isArchived = false, Nil))
+          LongTermGoal(3, "long-term2", "note", isArchived = false, Nil)
+        )
       )
     )
   }
 
   it should "generate correct hierarchy from long-term goal without a lifelong goal" in {
     val goals = Seq(
-      Goal(1, "name", 1, archived = false, 0, "note"),
+      Goal(1, "name", 1, archived = false, 0, "note")
     )
     LifelongGoal.goalHierarchy(goals, Nil) shouldBe Seq(
       LifelongGoal.empty(Seq(LongTermGoal(1, "name", "note", isArchived = false, Nil)))
@@ -80,13 +85,15 @@ class LifelongGoalTest extends FlatSpec with Matchers {
   it should "generate correct hierarchy from multiple long-term goals without a lifelong goal" in {
     val goals = Seq(
       Goal(1, "long-term1", 1, archived = false, 0, "note"),
-      Goal(2, "long-term2", 1, archived = false, 0, "note"),
+      Goal(2, "long-term2", 1, archived = false, 0, "note")
     )
     LifelongGoal.goalHierarchy(goals, Nil) shouldBe Seq(
       LifelongGoal.empty(
         Seq(
           LongTermGoal(1, "long-term1", "note", isArchived = false, Nil),
-          LongTermGoal(2, "long-term2", "note", isArchived = false, Nil)))
+          LongTermGoal(2, "long-term2", "note", isArchived = false, Nil)
+        )
+      )
     )
   }
 
@@ -103,18 +110,21 @@ class LifelongGoalTest extends FlatSpec with Matchers {
             "long-term",
             "note",
             isArchived = false,
-            Seq(ShortTermGoal(2, "short-term", "note", isArchived = false, Nil))))
+            Seq(ShortTermGoal(2, "short-term", "note", isArchived = false, Nil))
+          )
+        )
       )
     )
   }
 
   it should "generate correct hierarchy from short-term goal without a long-term goal" in {
     val goals = Seq(
-      Goal(1, "name", 2, archived = false, 0, "note"),
+      Goal(1, "name", 2, archived = false, 0, "note")
     )
     LifelongGoal.goalHierarchy(goals, Nil) shouldBe Seq(
       LifelongGoal.empty(
-        Seq(LongTermGoal.empty(Seq(ShortTermGoal(1, "name", "note", isArchived = false, Nil)))))
+        Seq(LongTermGoal.empty(Seq(ShortTermGoal(1, "name", "note", isArchived = false, Nil))))
+      )
     )
   }
 
@@ -148,31 +158,37 @@ class LifelongGoalTest extends FlatSpec with Matchers {
             isArchived = false,
             Seq(
               ShortTermGoal(795247, "g795247", "note", isArchived = false, Nil),
-              ShortTermGoal(794941, "g794941", "note", isArchived = false, Nil))
+              ShortTermGoal(794941, "g794941", "note", isArchived = false, Nil)
+            )
           ),
           LongTermGoal(
             789005,
             "g789005",
             "note",
             isArchived = false,
-            Seq(ShortTermGoal(796075, "g796075", "note", isArchived = false, Nil))),
+            Seq(ShortTermGoal(796075, "g796075", "note", isArchived = false, Nil))
+          ),
           LongTermGoal(
             795175,
             "g795175",
             "note",
             isArchived = false,
-            Seq(ShortTermGoal(765337, "g765337", "note", isArchived = false, Nil))),
-          LongTermGoal.empty(Seq(
-            ShortTermGoal(798421, "g798421", "note", isArchived = false, Nil),
-            ShortTermGoal(795379, "g795379", "note", isArchived = false, Nil),
-            ShortTermGoal(798211, "g798211", "note", isArchived = false, Nil),
-            ShortTermGoal(798207, "g798207", "note", isArchived = false, Nil),
-            ShortTermGoal(798247, "g798247", "note", isArchived = false, Nil),
-            ShortTermGoal(794881, "g794881", "note", isArchived = false, Nil),
-            ShortTermGoal(795173, "g795173", "note", isArchived = false, Nil),
-            ShortTermGoal(798209, "g798209", "note", isArchived = false, Nil)
-          ))
-        ))
+            Seq(ShortTermGoal(765337, "g765337", "note", isArchived = false, Nil))
+          ),
+          LongTermGoal.empty(
+            Seq(
+              ShortTermGoal(798421, "g798421", "note", isArchived = false, Nil),
+              ShortTermGoal(795379, "g795379", "note", isArchived = false, Nil),
+              ShortTermGoal(798211, "g798211", "note", isArchived = false, Nil),
+              ShortTermGoal(798207, "g798207", "note", isArchived = false, Nil),
+              ShortTermGoal(798247, "g798247", "note", isArchived = false, Nil),
+              ShortTermGoal(794881, "g794881", "note", isArchived = false, Nil),
+              ShortTermGoal(795173, "g795173", "note", isArchived = false, Nil),
+              ShortTermGoal(798209, "g798209", "note", isArchived = false, Nil)
+            )
+          )
+        )
+      )
     )
   }
 
@@ -189,8 +205,12 @@ class LifelongGoalTest extends FlatSpec with Matchers {
                 "short-term",
                 "note",
                 isArchived = false,
-                Seq(Task(7, "task", 1, completed = 0, due = None, hasStar = false))))
-          )))
+                Seq(Task(7, "task", 1, completed = 0, due = None, hasStar = false))
+              )
+            )
+          )
+        )
+      )
     )
   }
 
@@ -201,9 +221,13 @@ class LifelongGoalTest extends FlatSpec with Matchers {
       LifelongGoal.empty(
         Seq(
           LongTermGoal.empty(
-            Seq(ShortTermGoal.empty(
-              Seq(Task(1, "task", 0, completed = 0, due = None, hasStar = false))))
-          ))
+            Seq(
+              ShortTermGoal.empty(
+                Seq(Task(1, "task", 0, completed = 0, due = None, hasStar = false))
+              )
+            )
+          )
+        )
       )
     )
   }
@@ -224,18 +248,25 @@ class LifelongGoalTest extends FlatSpec with Matchers {
     )
     LifelongGoal.goalHierarchy(goals, tasks) shouldBe Seq(
       LifelongGoal.empty(
-        Seq(LongTermGoal.empty(Seq(ShortTermGoal(
-          1,
-          "short-term",
-          "note",
-          isArchived = false,
-          Seq(
-            Task(8, "task8", 1, completed = 900, due = None, hasStar = false),
-            Task(7, "task7", 1, completed = 19000, due = None, hasStar = false),
-            Task(10, "task10", 1, completed = 0, due = None, hasStar = true),
-            Task(9, "task9", 1, completed = 0, due = None, hasStar = false)
+        Seq(
+          LongTermGoal.empty(
+            Seq(
+              ShortTermGoal(
+                1,
+                "short-term",
+                "note",
+                isArchived = false,
+                Seq(
+                  Task(8, "task8", 1, completed = 900, due = None, hasStar = false),
+                  Task(7, "task7", 1, completed = 19000, due = None, hasStar = false),
+                  Task(10, "task10", 1, completed = 0, due = None, hasStar = true),
+                  Task(9, "task9", 1, completed = 0, due = None, hasStar = false)
+                )
+              )
+            )
           )
-        )))))
+        )
+      )
     )
   }
 
@@ -249,20 +280,26 @@ class LifelongGoalTest extends FlatSpec with Matchers {
     LifelongGoal.goalHierarchy(goals, tasks) shouldBe Seq(
       LifelongGoal.empty(
         Seq(
-          LongTermGoal.empty(Seq(
-            ShortTermGoal(
-              1,
-              "short-term",
-              "note",
-              isArchived = false,
-              Seq(
-                Task(7, "task7", 1, completed = 19000, due = None, hasStar = false),
-              )),
-            ShortTermGoal.empty(Seq(
-              Task(9, "task9", 0, completed = 0, due = None, hasStar = false)
-            ))
-          ))
-        ))
+          LongTermGoal.empty(
+            Seq(
+              ShortTermGoal(
+                1,
+                "short-term",
+                "note",
+                isArchived = false,
+                Seq(
+                  Task(7, "task7", 1, completed = 19000, due = None, hasStar = false)
+                )
+              ),
+              ShortTermGoal.empty(
+                Seq(
+                  Task(9, "task9", 0, completed = 0, due = None, hasStar = false)
+                )
+              )
+            )
+          )
+        )
+      )
     )
   }
 
@@ -279,11 +316,15 @@ class LifelongGoalTest extends FlatSpec with Matchers {
         Seq(
           LongTermGoal.empty(
             Seq(
-              ShortTermGoal.empty(Seq(
-                Task(7, "task7", 0, completed = 0, due = Some(today), hasStar = false),
-              ))
-            ))
-        ))
+              ShortTermGoal.empty(
+                Seq(
+                  Task(7, "task7", 0, completed = 0, due = Some(today), hasStar = false)
+                )
+              )
+            )
+          )
+        )
+      )
     )
   }
 
